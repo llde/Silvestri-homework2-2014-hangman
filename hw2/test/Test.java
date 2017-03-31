@@ -1,6 +1,7 @@
 package hw2.test;
 
 
+import hw2.game.ui.TextUIGames;
 import hw2.game.ui.TextUIWGames;
 import hw2.games.EvilHangman;
 import hw2.games.Hangman;
@@ -13,7 +14,7 @@ import java.nio.file.Paths;
  * modificata aggiungendo ad esempio altri test. */
 public class Test {
     public static void main(String[] args) throws IOException {
-        TextUIWGames.start(new Hangman(Paths.get("files", "parole3.txt"), StandardCharsets.UTF_8, 5) , new EvilHangman(Paths.get("files", "parole3.txt"), StandardCharsets.UTF_8, 5));
+        TextUIGames.start(new Hangman(Paths.get("files", "parole3.txt"), StandardCharsets.UTF_8, 5) , new EvilHangman(Paths.get("files", "parole3.txt"), StandardCharsets.UTF_8, 5));
 
     }
 }

@@ -216,129 +216,128 @@ public class TextUIWGames {
   *
   * @param games i giochi disponibili
   */
- public static void start(WGame... games) {  //print o println questo è il dilemma
-  WGState giocoex = null;
-  String UI = "";
-  int index = 0;
-  int sel;
-  Scanner TUI = new Scanner(System.in);
-  for (WGame game : games) {
-   index++;
-   UI += index + ". " + game.name().trim() + "\n";
-  }
-  UI += ((index + 1) + ". Quit\n" + "Digita un intero da 1 a " + (index + 1)) + ":\n";
-  String ReservedUI = UI;
-  while (true) {
-   System.out.println(UI);
-   try {
-     sel = Integer.valueOf(TUI.nextLine());
-   }
-   catch (Exception e){
-    String Akatosh = "";
-    for(int y = 1; y <= index + 1; y++){
-     Akatosh += " " + y + ",";
+    public static void start(WGame... games) {  //print o println questo è il dilemma
+        WGState giocoex = null;
+        String UI = "";
+        int index = 0;
+        int sel;
+        Scanner TUI = new Scanner(System.in);
+        for (WGame game : games) {
+            index++;
+            UI += index + ". " + game.name().trim() + "\n";
+        }
+        UI += ((index + 1) + ". Quit\n" + "Digita un intero da 1 a " + (index + 1)) + ":\n";
+        String ReservedUI = UI;
+        while (true) {
+            System.out.println(UI);
+        try {
+            sel = Integer.valueOf(TUI.nextLine());
+        }
+        catch (Exception e){
+            String Akatosh = "";
+            for(int y = 1; y <= index + 1; y++){
+                Akatosh += " " + y + ",";
+            }
+            String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
+            System.out.println(errore);
+            UI = "Digita un intero da 1 a " + (index + 1) + ":\n";
+            continue;
+        }
+        if (sel == games.length + 1){
+            System.out.println("Fine");
+            break;
+        }
+        if(sel > games.length +1){
+            String Akatosh = "";
+            for(int y = 1; y <= index + 1; y++){
+                Akatosh += " " + y + ",";
+            }
+            String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
+            System.out.println(errore);
+            UI = "Digita un intero da 1 a " + (index + 1) + ":\n";;
+            continue;
+        }
+        List<Param<?>> settings = games[sel - 1].params();
+        String Paramet = "";
+        int indexa = 0;
+        int nogenerate = 0;
+        String ReservedParam = "";
+        while (true) {
+            if(nogenerate == 0) {
+                Paramet += "Modifica i parametri di gioco o inizia a giocare:" + "\n";
+                indexa = 0;
+                if(!settings.isEmpty()) {
+                    for (Param<?> par : settings) {
+                        indexa++;
+                        Paramet += indexa + ". " + par.prompt().trim() + " (" + par.get() + ")" + "\n";
+                    }
+                }
+                Paramet += ((indexa + 1) + ". Inizia a giocare" + "\n" + "Digita un intero da 1 a " + (indexa + 1) + ":\n");
+                ReservedParam = Paramet;
+            }
+            System.out.println(Paramet);
+            Paramet = ReservedParam;
+            int sela = 0;
+            try {
+                sela = Integer.valueOf(TUI.nextLine());
+                if(sela > indexa + 1) throw  new  NumberFormatException();
+            }
+            catch(NumberFormatException e){
+                String Akatosh = "";
+                nogenerate = 1;
+                for(int y = 1; y <= indexa + 1; y++){
+                    Akatosh += " " + y + ",";
+                }
+                String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
+                System.out.println(errore);
+                Paramet = "Digita un intero da 1 a " + (indexa +1) + ":\n";
+                continue;
+            }
+            if (sela == settings.size() + 1) {
+                System.out.println("Per interrompere il gioco digita $stop\n");
+                giocoex = games[sel - 1].newGame();
+                break;
+            } else if (sela <= settings.size()) {
+                if(sela <= 0) continue;
+                System.out.println(settings.get(sela - 1).prompt() + ":");
+                List<?> pare = settings.get(sela -1).values();
+                List<String> templist= new ArrayList<>();
+                for(int i = 0; i < pare.size(); i++){
+                    templist.add(String.valueOf(pare.get(i)));
+                }
+                int setind = -2;
+                while(true) {
+                    String newval = TUI.nextLine();
+                    setind = templist.indexOf(newval);
+                    if (setind < 0) {
+                        System.out.println("Errore, input ammessi: " + pare.toString());
+                        continue;
+                    }
+                    else break;
+                }
+                settings.get(sela - 1).set(setind);
+                indexa = 0;
+                Paramet = "";
+            }
+        }
+        while (giocoex != null) {
+            System.out.println(giocoex.state());
+            String var = TUI.nextLine();
+            if(var.equalsIgnoreCase("$stop")) {
+                games[sel - 1].abort();
+                System.out.println("Gioco interrotto");
+                UI = ReservedUI;
+                giocoex = null;
+                break;
+            }
+            giocoex = games[sel - 1].player(var);
+            if (giocoex.action().equals(Action.END)) {
+                System.out.println(giocoex.state());
+                UI = ReservedUI;
+                giocoex = null;
+                break;
+            }
+        }
+        }
     }
-    String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
-    System.out.println(errore);
-    UI = "Digita un intero da 1 a " + (index + 1) + ":\n";
-    continue;
-   }
-    if (sel == games.length + 1){
-     System.out.println("Fine");
-     break;
-    }
-    if(sel > games.length +1){
-     String Akatosh = "";
-     for(int y = 1; y <= index + 1; y++){
-      Akatosh += " " + y + ",";
-     }
-     String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
-     System.out.println(errore);
-     UI = "Digita un intero da 1 a " + (index + 1) + ":\n";;
-     continue;
-    }
-    List<Param<?>> settings = games[sel - 1].params();
-    String Paramet = "";
-    int indexa = 0;
-    int nogenerate = 0;
-   String ReservedParam = "";
-   while (true) {
-     if(nogenerate == 0) {
-      Paramet += "Modifica i parametri di gioco o inizia a giocare:" + "\n";
-      indexa = 0;
-      if(!settings.isEmpty()) {
-       for (Param<?> par : settings) {
-        indexa++;
-        Paramet += indexa + ". " + par.prompt().trim() + " (" + par.get() + ")" + "\n";
-       }
-      }
-      Paramet += ((indexa + 1) + ". Inizia a giocare" + "\n" + "Digita un intero da 1 a " + (indexa + 1) + ":\n");
-      ReservedParam = Paramet;
-     }
-     System.out.println(Paramet);
-    Paramet = ReservedParam;
-     int sela = 0;
-     try {
-      sela = Integer.valueOf(TUI.nextLine());
-      if(sela > indexa + 1) throw  new  NumberFormatException();
-     }
-     catch(NumberFormatException e){
-      String Akatosh = "";
-      nogenerate = 1;
-      for(int y = 1; y <= indexa + 1; y++){
-       Akatosh += " " + y + ",";
-      }
-      String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
-      System.out.println(errore);
-      Paramet = "Digita un intero da 1 a " + (indexa +1) + ":\n";
-      continue;
-     }
-     if (sela == settings.size() + 1) {
-      System.out.println("Per interrompere il gioco digita $stop\n");
-      giocoex = games[sel - 1].newGame();
-      break;
-     } else if (sela <= settings.size()) {
-      if(sela <= 0) continue;
-      System.out.println(settings.get(sela - 1).prompt() + ":");
-      List<?> pare = settings.get(sela -1).values();
-      List<String> templist= new ArrayList<>();
-      for(int i = 0; i < pare.size(); i++){
-          templist.add(String.valueOf(pare.get(i)));
-      }
-      int setind = -2;
-      while(true) {
-       String newval = TUI.nextLine();
-       setind = templist.indexOf(newval);
-       if (setind < 0) {
-        System.out.println("Errore, input ammessi: " + pare.toString());
-        continue;
-       }
-       else break;
-      }
-      settings.get(sela - 1).set(setind);
-      indexa = 0;
-      Paramet = "";
-     }
-    }
-
-    while (giocoex != null) {
-      System.out.println(giocoex.state());
-      String var = TUI.nextLine();
-     if(var.equalsIgnoreCase("$stop")) {
-      games[sel - 1].abort();
-      System.out.println("Gioco interrotto");
-      UI = ReservedUI;
-      giocoex = null;
-      break;
-     }
-      giocoex = games[sel - 1].player(var);
-      if (giocoex.action().equals(Action.END)) {
-       System.out.println(giocoex.state());
-       UI = ReservedUI;
-       giocoex = null;
-       break;
-      }
-   }
-  }
- }
 }
