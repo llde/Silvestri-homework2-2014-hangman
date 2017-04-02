@@ -525,7 +525,7 @@ public class PartialGrade {
 
 
 
-    private static class DummyGame implements WGame {
+    public static class DummyGame implements WGame {
         @Override
         public String name() { return getClass().getSimpleName().toUpperCase(); }
         @Override
@@ -561,7 +561,7 @@ public class PartialGrade {
         private int count;
     }
 
-    private static class DummyGame2 implements WGame {
+    public static class DummyGame2 implements WGame {
         @Override
         public String name() { return getClass().getSimpleName().toUpperCase(); }
         @Override
@@ -1416,8 +1416,8 @@ public class PartialGrade {
     private static final Input INPUT = new Input();
     private static final Thread MAIN_THREAD = Thread.currentThread();
     private static double totalScore;
-    private static volatile boolean testing = false;
-    private static volatile String testWord = null;
+    public static volatile boolean testing = false;
+    public static volatile String testWord = null;
     private static final Random RND = new Random();
 
     private static final Set<String> S1 = new HashSet<>(Arrays.asList("a", "b", "c", "d", "e",

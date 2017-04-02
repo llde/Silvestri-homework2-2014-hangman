@@ -1,15 +1,16 @@
 package hw2.game.ui;
 
+
 import hw2.game.Action;
 import hw2.game.Param;
 import hw2.game.WGState;
 import hw2.game.WGame;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.charset.MalformedInputException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-
+import java.util.stream.Collectors;
 
 /** <b>IMPLEMENTARE I METODI SECONDO LE SPECIFICHE DATE NEI JAVADOC.</b>
  * <br>
@@ -201,143 +202,149 @@ import java.util.Scanner;
  </pre>
  */
 public class TextUIWGames {
- /**
-  * Inzia una sessione di gioco tramite interfaccia testuale che permette di
-  * giocare con i giochi specificati in games. Quando una partita è in corso, il
-  * giocatore può interromperla digitando $stop. In tal caso il gestore invocherà
-  * il metodo {@link hw2.game.WGame#abort()} del gioco.
-  * <p>
-  * La UI deve gestire il menu per la scelta del gioco e quello (o quelli) per la
-  * modifica dei valori degli eventuali parametri di gioco. Inoltre deve prendere
-  * l'input digitato dal giocatore e comunicarlo al gioco e visualizzare lo stato
-  * della partita ritornato dal gioco. Come nell'esempio mostrato sopra.
-  * <p>
-  * Si consiglia di leggere l'input sempre come intera linea.
-  *
-  * @param games i giochi disponibili
-  */
+    /**
+     * Inzia una sessione di gioco tramite interfaccia testuale che permette di
+     * giocare con i giochi specificati in games. Quando una partita è in corso, il
+     * giocatore può interromperla digitando $stop. In tal caso il gestore invocherà
+     * il metodo {@link hw2.game.WGame#abort()} del gioco.
+     * <p>
+     * La UI deve gestire il menu per la scelta del gioco e quello (o quelli) per la
+     * modifica dei valori degli eventuali parametri di gioco. Inoltre deve prendere
+     * l'input digitato dal giocatore e comunicarlo al gioco e visualizzare lo stato
+     * della partita ritornato dal gioco. Come nell'esempio mostrato sopra.
+     * <p>
+     * Si consiglia di leggere l'input sempre come intera linea.
+     *
+     * @param games i giochi disponibili
+     */
     public static void start(WGame... games) {  //print o println questo è il dilemma
-        WGState giocoex = null;
-        String UI = "";
+        boolean isException = false;
+        String PrimalUi = "";
         int index = 0;
-        int sel;
-        Scanner TUI = new Scanner(System.in);
-        for (WGame game : games) {
-            index++;
-            UI += index + ". " + game.name().trim() + "\n";
+        for(WGame game : games){
+            PrimalUi += (index +1) + ". " + game.name().trim() + "\n";
+            index +=1;
         }
-        UI += ((index + 1) + ". Quit\n" + "Digita un intero da 1 a " + (index + 1)) + ":\n";
-        String ReservedUI = UI;
-        while (true) {
-            System.out.println(UI);
-        try {
-            sel = Integer.valueOf(TUI.nextLine());
-        }
-        catch (Exception e){
-            String Akatosh = "";
-            for(int y = 1; y <= index + 1; y++){
-                Akatosh += " " + y + ",";
-            }
-            String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
-            System.out.println(errore);
-            UI = "Digita un intero da 1 a " + (index + 1) + ":\n";
-            continue;
-        }
-        if (sel == games.length + 1){
-            System.out.println("Fine");
-            break;
-        }
-        if(sel > games.length +1){
-            String Akatosh = "";
-            for(int y = 1; y <= index + 1; y++){
-                Akatosh += " " + y + ",";
-            }
-            String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
-            System.out.println(errore);
-            UI = "Digita un intero da 1 a " + (index + 1) + ":\n";;
-            continue;
-        }
-        List<Param<?>> settings = games[sel - 1].params();
-        String Paramet = "";
-        int indexa = 0;
-        int nogenerate = 0;
-        String ReservedParam = "";
-        while (true) {
-            if(nogenerate == 0) {
-                Paramet += "Modifica i parametri di gioco o inizia a giocare:" + "\n";
-                indexa = 0;
-                if(!settings.isEmpty()) {
-                    for (Param<?> par : settings) {
-                        indexa++;
-                        Paramet += indexa + ". " + par.prompt().trim() + " (" + par.get() + ")" + "\n";
+        PrimalUi += (index + 1) + ". Quit\n";
+        String insertUi = "Digita un intero da 1 a " + (index +1) + ":\n";
+        Scanner in = new Scanner(System.in);
+        mainloop: while(true){
+            if(!isException) System.out.print(PrimalUi);
+            isException = false;
+            System.out.println(insertUi);
+            try {
+                Integer t = Integer.valueOf(in.nextLine());
+                if (t > index + 1 || t <= 0) {
+                    throw new NumberFormatException();
+                }
+                if(t == index +1){
+                    System.out.println("Fine");
+                    in.close();
+                    break;
+                }
+                WGame game = games[t-1];
+                secondloop : while(true){
+                    if(!game.params().isEmpty()) {
+                        String par = "Modifica i parametri di gioco o inizia a giocare:" + "\n";
+                        int indexPar = 0;
+                        for (Param<?> param : game.params()) {
+                            par += (indexPar + 1) + ". " + param.prompt() + " (" + param.get() + ")\n";
+                            indexPar++;
+                        }
+                        par += (indexPar + 1) + ". Inizia a giocare\n";
+                        String p = "Digita un intero da 1 a " + (indexPar + 1) + ":\n";
+                        if (!isException) System.out.print(par);
+                        isException = false;
+                        System.out.println(p);
+                        try {
+                            int param = Integer.valueOf(in.nextLine());
+                            if (param > indexPar + 1 || param <= 0) throw new NumberFormatException();
+                            else if (param <= indexPar) {
+                                Param<?> parame = game.params().get(param - 1);
+                                System.out.println(parame.prompt().trim() + ":");
+                                paramloop:
+                                while (true) {
+                                    String arg = in.nextLine();
+                                    List<String> temp = new LinkedList<>();
+                                    parame.values().forEach((el) -> temp.add(String.valueOf(el)));
+                                    int argi = temp.indexOf(arg);
+                                    if (argi == -1) {
+                                        System.out.println("Errore, input ammessi: " + temp.toString() + "\n" + parame.prompt() + ":");
+                                        continue;
+                                    } else {
+                                        parame.set(argi);
+                                        break;
+                                    }
+                                }
+                            } else if (param == indexPar + 1) {
+                                System.out.println("Per interrompere il gioco digita $stop\n");
+                                WGState stato = game.newGame();
+                                gameloop:
+                                while (stato != null) {
+                                    System.out.println(stato.state());
+                                    String var = in.nextLine();
+                                    if (var.equals("$stop")) {
+                                        game.abort();
+                                        System.out.println("Gioco interrotto");
+                                        stato = null;
+                                        break secondloop;
+                                    }
+                                    stato = game.player(var);
+                                    if (stato.action().equals(Action.END)) {
+                                        System.out.println(stato.state());
+                                        stato = null;
+                                        break secondloop;
+                                    }
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            //TODO method
+                            isException = true;
+                            String error = "Errore, input ammessi: [$to_subs]";
+                            String sub = "";
+                            for (int i = 1; i <= indexPar + 1; i++) {
+                                sub += " " + i + ",";
+                            }
+                            error = error.replace("$to_subs", sub.trim().substring(0, sub.length() - 2));
+                            System.out.println(error);
+                            continue;
+                        }
+                    }
+                    else{
+                        System.out.println("Per interrompere il gioco digita $stop\n");
+                        WGState stato = game.newGame();
+                        gameloop:
+                        while (stato != null) {
+                            System.out.println(stato.state());
+                            String var = in.nextLine();
+                            if (var.equals("$stop")) {
+                                game.abort();
+                                System.out.println("Gioco interrotto");
+                                stato = null;
+                                break secondloop;
+                            }
+                            stato = game.player(var);
+                            if (stato.action().equals(Action.END)) {
+                                System.out.println(stato.state());
+                                stato = null;
+                                break secondloop;
+                            }
+                        }
                     }
                 }
-                Paramet += ((indexa + 1) + ". Inizia a giocare" + "\n" + "Digita un intero da 1 a " + (indexa + 1) + ":\n");
-                ReservedParam = Paramet;
-            }
-            System.out.println(Paramet);
-            Paramet = ReservedParam;
-            int sela = 0;
-            try {
-                sela = Integer.valueOf(TUI.nextLine());
-                if(sela > indexa + 1) throw  new  NumberFormatException();
             }
             catch(NumberFormatException e){
-                String Akatosh = "";
-                nogenerate = 1;
-                for(int y = 1; y <= indexa + 1; y++){
-                    Akatosh += " " + y + ",";
+                String error = "Errore, input ammessi: [$to_subs]";
+                isException = true;
+                String valid = "";
+                for(int i=1; i<=index+1;i++){
+                    valid += " " + i + ",";
                 }
-                String errore = "Errore, input ammessi: " + "["  + Akatosh.trim().substring(0, Akatosh.length() - 2) + "]";
-                System.out.println(errore);
-                Paramet = "Digita un intero da 1 a " + (indexa +1) + ":\n";
+                error = error.replace("$to_subs", valid.trim().substring(0, valid.length() -2));
+                System.out.println(error);
                 continue;
             }
-            if (sela == settings.size() + 1) {
-                System.out.println("Per interrompere il gioco digita $stop\n");
-                giocoex = games[sel - 1].newGame();
-                break;
-            } else if (sela <= settings.size()) {
-                if(sela <= 0) continue;
-                System.out.println(settings.get(sela - 1).prompt() + ":");
-                List<?> pare = settings.get(sela -1).values();
-                List<String> templist= new ArrayList<>();
-                for(int i = 0; i < pare.size(); i++){
-                    templist.add(String.valueOf(pare.get(i)));
-                }
-                int setind = -2;
-                while(true) {
-                    String newval = TUI.nextLine();
-                    setind = templist.indexOf(newval);
-                    if (setind < 0) {
-                        System.out.println("Errore, input ammessi: " + pare.toString());
-                        continue;
-                    }
-                    else break;
-                }
-                settings.get(sela - 1).set(setind);
-                indexa = 0;
-                Paramet = "";
-            }
         }
-        while (giocoex != null) {
-            System.out.println(giocoex.state());
-            String var = TUI.nextLine();
-            if(var.equalsIgnoreCase("$stop")) {
-                games[sel - 1].abort();
-                System.out.println("Gioco interrotto");
-                UI = ReservedUI;
-                giocoex = null;
-                break;
-            }
-            giocoex = games[sel - 1].player(var);
-            if (giocoex.action().equals(Action.END)) {
-                System.out.println(giocoex.state());
-                UI = ReservedUI;
-                giocoex = null;
-                break;
-            }
-        }
-        }
+
     }
 }

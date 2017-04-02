@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**  <b>IMPLEMENTARE I METODI SECONDO LE SPECIFICHE DATE NEI JAVADOC.</b>
  * <br>
@@ -46,7 +45,7 @@ import java.util.stream.Stream;
  * il computer deve dichiarare la parola che viene prima nell'ordimanete naturale
  * tra quelle in PW eccettuata la parola tentata dal giocatore. Ecco un esempio di
  * sessione di gioco come potrebbe essere prodotta dal gestore della UI testuale
- * {@link hw2.game.ui.TextUIWGames} fornendogli un oggetto EvilHangman:
+ * {@link TextUIWGames} fornendogli un oggetto EvilHangman:
  <pre>
  1. L'IMPICCATO DIABOLICO
  2. Quit

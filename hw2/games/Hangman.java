@@ -28,7 +28,7 @@ import java.util.List;
  * il giocatore ha commesso un errore. Il gioco termina o quando il giocatore
  * indovina la parola o quando commette un errore in più rispetto a quelli
  * ammessi. Ad esempio ecco una sessione di gioco come potrebbe essere prodotta
- * dal gestore della UI testuale {@link hw2.game.ui.TextUIWGames} fornendogli un
+ * dal gestore della UI testuale {@link TextUIWGames} fornendogli un
  * oggetto Hangman:
  <pre>
  1. L'IMPICCATO
